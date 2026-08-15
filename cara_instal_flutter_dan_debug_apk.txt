@@ -1,0 +1,411 @@
+PANDUAN INSTAL FLUTTER DAN DEBUG APK ANTHROVISION AI
+Windows 10/11
+
+PANDUAN PATH
+
+Panduan ini tidak mengunci lokasi instalasi ke nama pengguna atau drive
+tertentu. Pengguna dapat memasukkan lokasi yang diinginkan secara interaktif
+pada awal sesi PowerShell:
+
+  $FlutterSdk = Read-Host "Masukkan path folder utama Flutter SDK"
+  $ProjectPath = Read-Host "Masukkan path folder proyek AnthroVision"
+  $AndroidSdk = Read-Host "Masukkan path Android SDK, atau tekan Enter untuk default"
+  if ([string]::IsNullOrWhiteSpace($AndroidSdk)) {
+      $AndroidSdk = "$env:LOCALAPPDATA\Android\Sdk"
+  }
+
+Contoh nilai yang dapat dimasukkan pengguna:
+
+  $FlutterSdk = "D:\Development\flutter"
+  $ProjectPath = "D:\Projects\AnthroVision-AI-dual-mode-pastel-ui"
+  $AndroidSdk = "$env:LOCALAPPDATA\Android\Sdk"
+
+Ganti D:\Development\flutter dan D:\Projects\AnthroVision-AI-dual-mode-pastel-ui
+dengan lokasi yang dipilih pengguna. Lokasi lain seperti C:\Development\flutter
+atau E:\Flutter\flutter juga dapat digunakan.
+
+Variabel di atas hanya berlaku pada terminal PowerShell yang sedang dibuka.
+Jalankan kembali tiga baris tersebut saat membuka terminal baru.
+
+============================================================
+A. INSTALASI FLUTTER SDK
+============================================================
+
+1. Persiapan
+
+Pastikan Git sudah terpasang:
+
+  git --version
+
+Jika Git belum dikenali, instal Git for Windows dari:
+https://git-scm.com/download/win
+
+
+2. Unduh Flutter secara manual
+
+Buka arsip resmi Flutter:
+https://docs.flutter.dev/install/archive
+
+Pilih:
+- Platform: Windows
+- Channel: Stable
+
+Unduh file dengan bentuk nama:
+
+  flutter_windows_x.x.x-stable.zip
+
+
+3. Ekstrak Flutter
+
+Buat folder instalasi sesuai lokasi yang diinginkan pengguna. Nilai
+$FlutterSdk harus menunjuk langsung ke folder utama Flutter.
+
+Ekstrak ZIP sehingga struktur akhirnya menjadi:
+
+  $FlutterSdk\bin\flutter.bat
+
+Contoh jika $FlutterSdk = "D:\Development\flutter":
+
+  D:\Development\flutter\bin\flutter.bat
+
+Jangan menempatkan Flutter SDK di dalam folder proyek AnthroVision.
+Hindari Program Files karena dapat memerlukan izin administrator.
+
+Untuk memastikan ekstraksi berhasil, jalankan PowerShell:
+
+  Test-Path "$FlutterSdk\bin\flutter.bat"
+
+Hasil yang benar adalah:
+
+  True
+
+
+4. Tambahkan Flutter ke PATH
+
+Buka:
+
+  Edit the system environment variables
+  > Environment Variables
+  > User variables
+  > Path
+  > Edit
+  > New
+
+Tambahkan folder bin dari lokasi Flutter yang dipilih:
+
+  <LOKASI_FLUTTER_SDK>\bin
+
+Contoh:
+
+  D:\Development\flutter\bin
+
+Klik OK pada seluruh jendela. Tutup semua PowerShell dan VS Code,
+kemudian buka kembali.
+
+Untuk mengaktifkan Flutter hanya pada terminal yang sedang dibuka:
+
+  $env:Path = "$FlutterSdk\bin;$env:Path"
+
+
+5. Verifikasi instalasi
+
+Jalankan:
+
+  flutter --version
+  dart --version
+  flutter doctor -v
+
+Dart tidak perlu diinstal terpisah karena sudah termasuk di dalam Flutter.
+
+
+============================================================
+B. KONFIGURASI ANDROID
+============================================================
+
+1. Instal Android Studio dan Android SDK.
+
+2. Buka Android Studio > SDK Manager, lalu pastikan komponen berikut tersedia:
+
+- Android SDK Platform
+- Android SDK Build-Tools
+- Android SDK Command-line Tools
+- Android SDK Platform-Tools
+- Android Emulator (jika memakai emulator)
+
+3. Terima lisensi Android:
+
+  flutter doctor --android-licenses
+
+Tekan y untuk menyetujui setiap lisensi.
+
+4. Periksa kembali:
+
+  flutter doctor -v
+
+Peringatan Visual Studio dapat diabaikan jika hanya menargetkan Android dan
+Chrome. Visual Studio diperlukan untuk membuat aplikasi Windows Desktop.
+
+
+============================================================
+C. MEMBUKA PROYEK ANTHROVISION
+============================================================
+
+1. Buka VS Code.
+
+2. Pilih File > Open Folder.
+
+3. Pilih folder sesuai nilai $ProjectPath yang telah ditentukan.
+
+Contoh:
+
+  D:\Projects\AnthroVision-AI-dual-mode-pastel-ui
+
+Folder yang benar harus berisi:
+
+- pubspec.yaml
+- lib
+- assets
+- android
+- web
+
+4. Buka Terminal > New Terminal, kemudian jalankan:
+
+  flutter clean
+  flutter pub get
+
+
+============================================================
+D. DEBUG MENGGUNAKAN HP ANDROID
+============================================================
+
+1. Aktifkan Developer Options pada HP:
+
+- Buka Settings > About Phone.
+- Tekan Build Number sebanyak 7 kali.
+- Buka Developer Options.
+- Aktifkan USB Debugging.
+
+2. Sambungkan HP menggunakan kabel data.
+
+3. Pilih mode USB File Transfer jika diperlukan.
+
+4. Setujui pesan "Allow USB debugging" pada HP.
+
+5. Periksa perangkat:
+
+  adb devices
+  flutter devices
+
+Status ADB harus "device", bukan "unauthorized".
+
+6. Jalankan mode debug:
+
+  flutter run
+
+Jika terdapat beberapa perangkat:
+
+  flutter devices
+  flutter run -d ID_PERANGKAT
+
+Ganti ID_PERANGKAT dengan ID yang ditampilkan oleh flutter devices.
+
+Saat aplikasi berjalan:
+
+- Tekan r untuk hot reload.
+- Tekan R untuk hot restart.
+- Tekan q untuk menghentikan aplikasi.
+
+
+============================================================
+E. DEBUG MENGGUNAKAN ANDROID EMULATOR
+============================================================
+
+1. Buka Android Studio > Device Manager.
+
+2. Buat atau jalankan emulator Android.
+
+3. Periksa emulator:
+
+  flutter devices
+
+4. Jalankan:
+
+  flutter run -d ID_EMULATOR
+
+Jika hanya ada satu perangkat aktif, cukup gunakan:
+
+  flutter run
+
+
+============================================================
+F. MEMBUAT APK DEBUG
+============================================================
+
+Jalankan dari folder proyek yang memiliki pubspec.yaml:
+
+  flutter clean
+  flutter pub get
+  flutter build apk --debug
+
+APK debug akan dibuat di:
+
+  build\app\outputs\flutter-apk\app-debug.apk
+
+APK debug digunakan untuk pengujian dan belum ditujukan untuk publikasi.
+
+
+============================================================
+G. MENGINSTAL APK DEBUG KE HP
+============================================================
+
+Cara 1 - menggunakan Flutter:
+
+  flutter install -d ID_PERANGKAT
+
+Cara 2 - menggunakan ADB:
+
+  adb install -r "build\app\outputs\flutter-apk\app-debug.apk"
+
+Opsi -r mempertahankan data aplikasi ketika versi debug diperbarui.
+
+Jika ingin memasang manual, pindahkan app-debug.apk ke HP, buka file tersebut,
+lalu izinkan "Install unknown apps" untuk aplikasi file manager yang digunakan.
+
+
+============================================================
+H. MELIHAT LOG DAN MENCARI ERROR
+============================================================
+
+Log dari Flutter:
+
+  flutter logs
+
+Log Android lebih lengkap:
+
+  adb logcat
+
+Menjalankan aplikasi dengan log verbose:
+
+  flutter run -v
+
+Untuk menghentikan adb logcat, tekan Ctrl+C.
+
+
+============================================================
+I. CATATAN BACKEND AI ANTHROVISION
+============================================================
+
+Alamat backend berbeda berdasarkan perangkat:
+
+- Flutter Web di PC:
+  http://127.0.0.1:8000
+
+- Android Emulator:
+  http://10.0.2.2:8000
+
+- HP fisik:
+  Gunakan alamat IP lokal komputer, misalnya http://192.168.1.10:8000
+
+Untuk HP fisik:
+
+1. HP dan komputer harus memakai jaringan Wi-Fi yang sama.
+2. Jalankan FastAPI agar menerima koneksi jaringan:
+
+   uvicorn main:app --host 0.0.0.0 --port 8000
+
+3. Izinkan Python/port 8000 pada Windows Firewall.
+4. Ubah base URL Android pada service AI menjadi alamat IP komputer.
+
+Catatan: base URL 10.0.2.2 hanya berlaku untuk Android Emulator dan tidak
+dapat digunakan langsung dari HP fisik.
+
+
+============================================================
+J. PENYELESAIAN ERROR UMUM
+============================================================
+
+1. "flutter is not recognized"
+
+Pastikan PATH berisi:
+
+  <LOKASI_FLUTTER_SDK>\bin
+
+Contoh:
+
+  D:\Development\flutter\bin
+
+Tutup dan buka kembali terminal setelah mengubah PATH.
+
+
+2. "No devices found"
+
+- Pastikan USB Debugging aktif.
+- Gunakan kabel data, bukan kabel isi daya saja.
+- Setujui izin debugging di layar HP.
+- Jalankan adb kill-server dan adb start-server:
+
+  adb kill-server
+  adb start-server
+  adb devices
+
+
+3. "unauthorized" pada adb devices
+
+- Cabut dan sambungkan kembali kabel USB.
+- Pilih Revoke USB debugging authorizations pada Developer Options.
+- Setujui kembali fingerprint komputer pada HP.
+
+
+4. Multiple adb binaries found
+
+Gunakan ADB bawaan Android SDK:
+
+  $AndroidSdk\platform-tools\adb.exe
+
+Lokasi default Windows biasanya:
+
+  %LOCALAPPDATA%\Android\Sdk\platform-tools\adb.exe
+
+Jika terdapat folder ADB tambahan di PATH, misalnya C:\adb, hapus folder
+tersebut dari PATH jika tidak digunakan agar tidak terjadi konflik.
+
+
+5. Pub get gagal
+
+Periksa internet, lalu jalankan:
+
+  flutter clean
+  flutter pub cache repair
+  flutter pub get
+
+
+6. Build Gradle gagal atau lambat
+
+- Pastikan koneksi internet stabil pada build pertama.
+- Jalankan flutter doctor -v.
+- Tutup emulator lain yang tidak digunakan.
+- Jalankan kembali flutter clean dan flutter pub get.
+
+
+============================================================
+K. URUTAN CEPAT YANG DISARANKAN
+============================================================
+
+  Set-Location $ProjectPath
+  flutter doctor -v
+  flutter clean
+  flutter pub get
+  flutter devices
+  flutter run -d ID_PERANGKAT
+
+Untuk menghasilkan APK debug:
+
+  flutter build apk --debug
+
+Lokasi hasil:
+
+  $ProjectPath\build\app\outputs\flutter-apk\app-debug.apk
+
+============================================================
+SELESAI
+============================================================
